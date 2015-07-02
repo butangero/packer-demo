@@ -1,0 +1,27 @@
+{
+  "variables": {
+    "os_image_id": "f3db1197-fc56-4d50-864a-6889b4802457"
+  },
+  "builders": [
+    {
+      "type": "openstack",
+      "flavor": "2",
+      "image_name": "packer-test1",
+      "source_image": "{{user `os_image_id`}}",
+      "username": "centos",
+      "insecure": true
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "shell",
+      "scripts": [
+        "./scripts/install-updates.sh",
+        "./scripts/install-cloud-init.sh",
+        "./scripts/run-puppet.sh",
+        "./scripts/clean-up.sh"
+      ],
+      "execute_command": "{{ .Vars }} sudo sh '{{ .Path }}'"
+    }
+  ]
+}

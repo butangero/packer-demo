@@ -1,0 +1,50 @@
+{
+  "variables": {
+    "digi_ocean_token": "xyz"
+  },
+  "builders": [
+    {
+      "type": "digitalocean",
+      "api_token": "{{user `digi_ocean_token`}}",
+      "image": "centos-7-0-x64",
+      "region": "nyc2",
+      "size": "512mb"
+    },
+    {
+      "type": "qemu",
+      "qemuargs": [
+        [ "-m", "1024M" ]
+      ],
+      "boot_command": [
+        "<tab> text ks=http://{{ .HTTPIP }}:{{ .HTTPPort }}/ks.cfg<enter><wait>"
+      ],
+      "boot_wait": "10s",
+      "disk_size": 4096,
+      "headless": true,
+      "http_directory": "http",
+      "iso_url": "http://mirrors.xmission.com/centos/7/isos/x86_64/CentOS-7-x86_64-NetInstall-1503.iso",
+      "iso_checksum": "fd1951905c4c26560c807e81767278fec46ef8bb",
+      "iso_checksum_type": "sha1",
+      "ssh_username": "packer",
+      "ssh_password": "packer",
+      "ssh_port": 22,
+      "ssh_wait_timeout": "10000s", "shutdown_command": "echo '/sbin/halt -h -p' > /tmp/shutdown.sh; echo 'packer'|sudo -S sh '/tmp/shutdown.sh'"
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "shell",
+      "scripts": [
+        "./scripts/install-updates.sh",
+        "./scripts/install-cloud-init.sh",
+        "./scripts/run-puppet.sh",
+        "./scripts/clean-up.sh"
+      ],
+      "override": {
+        "qemu": {
+          "execute_command": "{{ .Vars }} sudo sh '{{ .Path }}'"
+        }
+      }
+    }
+  ]
+}

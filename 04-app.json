@@ -1,0 +1,36 @@
+{
+  "variables": {
+    "digi_ocean_token": "xyz"
+  },
+  "builders": [
+    {
+      "type": "digitalocean",
+      "api_token": "{{user `digi_ocean_token`}}",
+      "image": "centos-7-0-x64",
+      "region": "nyc2",
+      "size": "1gb",
+      "droplet_name": "app1-packer",
+      "snapshot_name": "app1-{{timestamp}}"
+    },
+    {
+      "type": "digitalocean",
+      "api_token": "{{user `digi_ocean_token`}}",
+      "image": "centos-7-0-x64",
+      "region": "nyc2",
+      "size": "1gb",
+      "droplet_name": "app2-packer",
+      "snapshot_name": "app2-{{timestamp}}"
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "shell",
+      "scripts": [
+        "./scripts/install-updates.sh",
+        "./scripts/install-cloud-init.sh",
+        "./scripts/run-puppet.sh",
+        "./scripts/clean-up.sh"
+      ]
+    }
+  ]
+}
